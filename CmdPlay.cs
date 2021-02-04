@@ -31,7 +31,7 @@ namespace CmdPlay
                                 "      Space - Play / Pause    \n" +
                                 "           Esc - Exit         \n" +
                                 "------------------------------\n");
-            ConsoleColor originalForegroundColor = Console.ForegroundColor; /* Preserve the old old colours to print warning message */
+            ConsoleColor originalForegroundColor = Console.ForegroundColor; /* Preserve the old colours to print warning message */
             ConsoleColor originalBackgroundColor = Console.BackgroundColor;
 
             Console.ForegroundColor = ConsoleColor.Red;
