@@ -6,6 +6,8 @@ Thus it needs a reference to NAudio and a copy of ffmpeg.exe in the working dire
 
 Compiled binary for windows: https://github.com/mariiaan/CmdPlay/releases
 
+Demonstration video: https://youtu.be/6zs6S_I5gH8?t=16
+
 # Known issues / weaknesses
 No buffering, long load times
 
