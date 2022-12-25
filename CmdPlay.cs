@@ -139,6 +139,7 @@ namespace CmdPlay
             Console.ReadLine();
             woe.Play();
 
+            Console.CursorVisible = false;
             while(true)
             {
                 float percentage = woe.GetPosition() / (float)reader.Length;
@@ -172,6 +173,7 @@ namespace CmdPlay
                     }
                 }
             }
+            Console.CursorVisible = true;
             Console.WriteLine("Done. Press any key to close");
             Console.ReadKey();
         }
