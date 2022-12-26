@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.IO;
@@ -26,7 +26,7 @@ namespace CmdPlay
                 inputFilename = args[0];
             }
 
-            Console.WriteLine(  "------------------------------\n" +
+            Console.WriteLine("------------------------------\n" +
                                 "            Controls          \n" +
                                 "      Space - Play / Pause    \n" +
                                 "           Esc - Exit         \n" +
@@ -43,14 +43,14 @@ namespace CmdPlay
             Console.WriteLine("[INFO] Please wait.. Processing..");
             Console.WriteLine("[INFO] Step 1 / 4: Cleaning up...");
 
-            if(Directory.Exists("tmp"))
+            if (Directory.Exists("tmp"))
             {
-                if(Directory.Exists("tmp\\frames\\"))
+                if (Directory.Exists("tmp\\frames\\"))
                 {
                     Directory.Delete("tmp\\frames\\", true);
                 }
                 Directory.CreateDirectory("tmp\\frames\\");
-                if(File.Exists("tmp\\audio.wav"))
+                if (File.Exists("tmp\\audio.wav"))
                 {
                     File.Delete("tmp\\audio.wav");
                 }
@@ -67,22 +67,44 @@ namespace CmdPlay
             Console.WriteLine("[INFO] Step 2 / 4: Extracting frames...");
             Process ffmpegProcess = new Process(); /* Launch ffmpeg process to extract the frames */
             ffmpegProcess.StartInfo.FileName = "ffmpeg.exe";
-            ffmpegProcess.StartInfo.Arguments = "-i \"" + inputFilename + "\" -vf scale=" + 
+            ffmpegProcess.StartInfo.Arguments = "-i \"" + inputFilename + "\" -vf scale=" +
                                     targetFrameWidth + ":" + targetFrameHeight + " tmp\\frames\\%0d.bmp";
 
-            ffmpegProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            ffmpegProcess.Start();
-            Console.WriteLine("[INFO] Waiting for ffmpeg.exe to finish...");
-            ffmpegProcess.WaitForExit();
+            try
+            {
+                ffmpegProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                ffmpegProcess.Start();
+                Console.WriteLine("[INFO] Waiting for ffmpeg.exe to finish...");
+                ffmpegProcess.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[ERROR] Failed to launch ffmpeg.exe! Please make sure it is in the same directory as this program.");
+                Console.WriteLine("[ERROR] Exception: " + e.Message);
+                Console.WriteLine("[ERROR] Press any key to exit..");
+                Console.ReadKey();
+                return;
+            }
 
             Console.WriteLine("[INFO] Step 3 / 4: Extracting audio...");
             ffmpegProcess = new Process();
             ffmpegProcess.StartInfo.FileName = "ffmpeg.exe";
             ffmpegProcess.StartInfo.Arguments = "-i \"" + inputFilename + "\" tmp\\audio.wav";
             ffmpegProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            ffmpegProcess.Start();
-            Console.WriteLine("[INFO] Waiting for ffmpeg.exe to finish...");
-            ffmpegProcess.WaitForExit();
+
+            try
+            {
+                ffmpegProcess.Start();
+                Console.WriteLine("[INFO] Waiting for ffmpeg.exe to finish...");
+                ffmpegProcess.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[ERROR] Failed to extract audio! " + e.Message);
+                Console.WriteLine("[INFO] Press any key to exit..");
+                Console.ReadKey();
+                return;
+            }
 
             Console.WriteLine("[INFO] Step 4 / 4: Converting to ascii... (This can take some time!)");
             Console.Write("-> [PROGRESS] [0  %] [                    ]");
@@ -91,26 +113,26 @@ namespace CmdPlay
 
             int frameCount = Directory.GetFiles("tmp\\frames", "*.bmp").Length;
             int frameIndex = 1;
-            while(true)
+            while (true)
             {
                 string filename = "tmp\\frames\\" + frameIndex.ToString() + ".bmp";
-                if(!File.Exists(filename))
+                if (!File.Exists(filename))
                 {
                     break;
                 }
                 StringBuilder frameBuilder = new StringBuilder();
                 using (Bitmap b = new Bitmap(filename))
                 {
-                    for(int y = 0; y < b.Height; y++)
+                    for (int y = 0; y < b.Height; y++)
                     {
-                        for(int x = 0; x < b.Width; x++)
+                        for (int x = 0; x < b.Width; x++)
                         {
                             int dIndex = (int)(b.GetPixel(x, y).GetBrightness() * brightnessLevels.Length);
-                            if(dIndex < 0)
+                            if (dIndex < 0)
                             {
                                 dIndex = 0;
                             }
-                            else if(dIndex >= brightnessLevels.Length)
+                            else if (dIndex >= brightnessLevels.Length)
                             {
                                 dIndex = brightnessLevels.Length - 1;
                             }
@@ -126,7 +148,7 @@ namespace CmdPlay
                 Console.SetCursorPosition(15, currentCursorHeight);
                 Console.Write(percentage.ToString());
                 Console.SetCursorPosition(22, currentCursorHeight);
-                for(int i = 0; i < percentage / 5; i++)
+                for (int i = 0; i < percentage / 5; i++)
                 {
                     Console.Write("#");
                 }
@@ -140,20 +162,20 @@ namespace CmdPlay
             woe.Play();
 
             Console.CursorVisible = false;
-            while(true)
+            while (true)
             {
                 float percentage = woe.GetPosition() / (float)reader.Length;
                 int frame = (int)(percentage * frameCount);
-                if(frame >= frames.Count)
+                if (frame >= frames.Count)
                     break;
 
                 Console.SetCursorPosition(0, 0);
                 Console.WriteLine(frames[frame]);
 
-                if(Console.KeyAvailable)
+                if (Console.KeyAvailable)
                 {
                     ConsoleKey pressed = Console.ReadKey().Key;
-                    switch(pressed)
+                    switch (pressed)
                     {
                         case ConsoleKey.Spacebar:
                             {
