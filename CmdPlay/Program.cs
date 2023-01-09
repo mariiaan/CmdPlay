@@ -4,15 +4,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using System.Collections;
 using NAudio;
 using NAudio.Wave;
+using System.Threading;
+using System.Linq;
 
 namespace CmdPlay
 {
     class Program
     {
-        const string brightnessLevels = " .-+*wGHM#&%";
-
+        const string brightnessLevels = @".'`^,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+        
         static void Main(string[] args)
         {
             string inputFilename;
@@ -76,6 +79,12 @@ namespace CmdPlay
                 ffmpegProcess.Start();
                 Console.WriteLine("[INFO] Waiting for ffmpeg.exe to finish...");
                 ffmpegProcess.WaitForExit();
+
+                if (ffmpegProcess.ExitCode != 0)
+                {
+                    throw new Exception("[ERROR] ffmpeg process failed!");
+                }
+                
             }
             catch (Exception e)
             {
@@ -97,6 +106,11 @@ namespace CmdPlay
                 ffmpegProcess.Start();
                 Console.WriteLine("[INFO] Waiting for ffmpeg.exe to finish...");
                 ffmpegProcess.WaitForExit();
+
+                if (ffmpegProcess.ExitCode != 0)
+                {
+                    throw new Exception("[ERROR] Failed to extract audio!");
+                }
             }
             catch (Exception e)
             {
