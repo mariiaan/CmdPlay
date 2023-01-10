@@ -21,7 +21,7 @@ NAudio, including its source code and binaries are licensed under the Microsoft 
 ### Automatic installation
 - Install the compiled binary from [here](https://github.com/obvMellow/CmdPlay/releases)
 - Unzip the file
-- Run setup.exe
+- Run CmdPlay.exe
 
 ### Manual Installation
 
