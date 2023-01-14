@@ -1,22 +1,18 @@
-﻿using System;
-using System.Drawing;
+﻿using NAudio.Wave;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Text;
-using System.Collections.Generic;
-using System.Collections;
-using NAudio;
-using NAudio.Wave;
-using System.Threading;
-using System.Linq;
 
 namespace CmdPlay
 {
-    class Program
+    internal class Program
     {
-        const string brightnessLevels = @".'`^,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
-        
-        static void Main(string[] args)
+        private const string brightnessLevels = @".'`^,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+
+        private static void Main(string[] args)
         {
             string inputFilename;
             if (args.Length == 0) /* Ask user manually if no parameters specified */
@@ -84,7 +80,6 @@ namespace CmdPlay
                 {
                     throw new Exception("[ERROR] ffmpeg process failed!");
                 }
-                
             }
             catch (Exception e)
             {
@@ -127,6 +122,8 @@ namespace CmdPlay
 
             int frameCount = Directory.GetFiles("tmp\\frames", "*.bmp").Length;
             int frameIndex = 1;
+
+            Console.CursorVisible = false;
             while (true)
             {
                 string filename = "tmp\\frames\\" + frameIndex.ToString() + ".bmp";
@@ -167,6 +164,7 @@ namespace CmdPlay
                     Console.Write("#");
                 }
             }
+            Console.CursorVisible = true;
 
             AudioFileReader reader = new AudioFileReader("tmp\\audio.wav");
             WaveOutEvent woe = new WaveOutEvent();
