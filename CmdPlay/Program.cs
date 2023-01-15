@@ -35,7 +35,7 @@ namespace CmdPlay
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.BackgroundColor = ConsoleColor.Black; /* Contrast: Red on black */
-            Console.WriteLine("NOTE: Do not resize the window starting from now! (Resize before program init)");
+
             Console.ForegroundColor = originalForegroundColor; /* Reset old colours */
             Console.BackgroundColor = originalBackgroundColor;
 
@@ -60,8 +60,22 @@ namespace CmdPlay
                 Directory.CreateDirectory("tmp\\frames\\");
             }
 
-            int targetFrameWidth = Console.WindowWidth - 1;
-            int targetFrameHeight = Console.WindowHeight - 2;
+            int targetFrameWidth;
+            int targetFrameHeight;
+
+            Console.Write("\nEnter the resolution in rows and columns separated by ':' (leave blank to use console size): ");
+            string[] frameSize = Console.ReadLine().Split(':');
+
+            if (frameSize.Length == 2)
+            {
+                targetFrameWidth = int.Parse(frameSize[0]);
+                targetFrameHeight = int.Parse(frameSize[1]);
+            }
+            else
+            {
+                targetFrameWidth = Console.WindowWidth - 1;
+                targetFrameHeight = Console.WindowHeight - 2;
+            }
 
             Console.WriteLine("[INFO] Step 2 / 4: Extracting frames...");
             Process ffmpegProcess = new Process(); /* Launch ffmpeg process to extract the frames */
