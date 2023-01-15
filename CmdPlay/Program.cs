@@ -10,7 +10,7 @@ namespace CmdPlay
 {
     internal class Program
     {
-        private const string brightnessLevels = @".'`^,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+        private const string brightnessLevels = @" .'`^,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 
         private static void Main(string[] args)
         {
@@ -35,12 +35,12 @@ namespace CmdPlay
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.BackgroundColor = ConsoleColor.Black; /* Contrast: Red on black */
-            Console.WriteLine("NOTE: Do not resize the window starting from now! (Resize before program init)");
+
             Console.ForegroundColor = originalForegroundColor; /* Reset old colours */
             Console.BackgroundColor = originalBackgroundColor;
 
-            Console.WriteLine("[INFO] Please wait.. Processing..");
-            Console.WriteLine("[INFO] Step 1 / 4: Cleaning up...");
+            PrintlnColored("[INFO] Please wait.. Processing..", ConsoleColor.Yellow, (1, 5));
+            PrintlnColored("[INFO] Step 1 / 4: Cleaning up...", ConsoleColor.Yellow, (1, 5));
 
             if (Directory.Exists("tmp"))
             {
@@ -60,10 +60,25 @@ namespace CmdPlay
                 Directory.CreateDirectory("tmp\\frames\\");
             }
 
-            int targetFrameWidth = Console.WindowWidth - 1;
-            int targetFrameHeight = Console.WindowHeight - 2;
+            int targetFrameWidth;
+            int targetFrameHeight;
 
-            Console.WriteLine("[INFO] Step 2 / 4: Extracting frames...");
+            PrintColored("\n[INPUT] Enter the resolution in rows and columns separated by ':' (leave blank to use console size): ",
+                ConsoleColor.Blue, (2, 7));
+            string[] frameSize = Console.ReadLine().Split(':');
+
+            if (frameSize.Length == 2)
+            {
+                targetFrameWidth = int.Parse(frameSize[0]);
+                targetFrameHeight = int.Parse(frameSize[1]);
+            }
+            else
+            {
+                targetFrameWidth = Console.WindowWidth - 1;
+                targetFrameHeight = Console.WindowHeight - 2;
+            }
+
+            PrintlnColored("\n[INFO] Step 2 / 4: Extracting frames...", ConsoleColor.Yellow, (2, 6));
             Process ffmpegProcess = new Process(); /* Launch ffmpeg process to extract the frames */
             ffmpegProcess.StartInfo.FileName = "ffmpeg.exe";
             ffmpegProcess.StartInfo.Arguments = "-i \"" + inputFilename + "\" -vf scale=" +
@@ -73,24 +88,24 @@ namespace CmdPlay
             {
                 ffmpegProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 ffmpegProcess.Start();
-                Console.WriteLine("[INFO] Waiting for ffmpeg.exe to finish...");
+                PrintlnColored("[INFO] Waiting for ffmpeg.exe to finish...", ConsoleColor.Yellow, (1, 5));
                 ffmpegProcess.WaitForExit();
 
                 if (ffmpegProcess.ExitCode != 0)
                 {
-                    throw new Exception("[ERROR] ffmpeg process failed!");
+                    throw new Exception("ffmpeg process failed!");
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("[ERROR] Failed to launch ffmpeg.exe! Please make sure it is in the same directory as this program.");
-                Console.WriteLine("[ERROR] Exception: " + e.Message);
-                Console.WriteLine("[ERROR] Press any key to exit..");
+                PrintlnColored("[ERROR] " + e.Message, ConsoleColor.Red, (1, 6));
+                PrintlnColored("[ERROR] Press any key to exit..", ConsoleColor.Red, (1, 6));
+
                 Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("[INFO] Step 3 / 4: Extracting audio...");
+            PrintlnColored("[INFO] Step 3 / 4: Extracting audio...", ConsoleColor.Yellow, (1, 5));
             ffmpegProcess = new Process();
             ffmpegProcess.StartInfo.FileName = "ffmpeg.exe";
             ffmpegProcess.StartInfo.Arguments = "-i \"" + inputFilename + "\" tmp\\audio.wav";
@@ -99,24 +114,25 @@ namespace CmdPlay
             try
             {
                 ffmpegProcess.Start();
-                Console.WriteLine("[INFO] Waiting for ffmpeg.exe to finish...");
+                PrintlnColored("[INFO] Waiting for ffmpeg.exe to finish...", ConsoleColor.Yellow, (2, 5));
                 ffmpegProcess.WaitForExit();
 
                 if (ffmpegProcess.ExitCode != 0)
                 {
-                    throw new Exception("[ERROR] Failed to extract audio!");
+                    throw new Exception("Failed to extract audio!");
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("[ERROR] Failed to extract audio! " + e.Message);
-                Console.WriteLine("[INFO] Press any key to exit..");
+                PrintlnColored("[ERROR] " + e.Message, ConsoleColor.Red, (1, 6));
+                PrintlnColored("[ERROR] Press any key to exit..", ConsoleColor.Red, (1, 6));
+
                 Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("[INFO] Step 4 / 4: Converting to ascii... (This can take some time!)");
-            Console.Write("-> [PROGRESS] [0  %] [                    ]");
+            PrintlnColored("[INFO] Step 4 / 4: Converting to ascii... (This can take some time!)", ConsoleColor.Yellow, (1, 5));
+            PrintColored("-> [PROGRESS] [0  %] [                    ]", ConsoleColor.Green, (4, 12));
             int currentCursorHeight = Console.CursorTop;
             List<string> frames = new List<string>();
 
@@ -156,6 +172,11 @@ namespace CmdPlay
                 frameIndex++;
 
                 int percentage = (int)(frameIndex / (float)frameCount * 100);
+
+                if (percentage > 100)
+                {
+                    percentage = 100;
+                }
                 Console.SetCursorPosition(15, currentCursorHeight);
                 Console.Write(percentage.ToString());
                 Console.SetCursorPosition(22, currentCursorHeight);
@@ -210,6 +231,44 @@ namespace CmdPlay
             Console.CursorVisible = true;
             Console.WriteLine("Done. Press any key to close");
             Console.ReadKey();
+        }
+
+        private static void PrintlnColored(string text, ConsoleColor color, (int startIndex, int endIndex) position)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (i == position.startIndex)
+                {
+                    Console.ForegroundColor = color;
+                }
+
+                if (i == position.endIndex)
+                {
+                    Console.ResetColor();
+                }
+
+                Console.Write(text[i]);
+            }
+
+            Console.WriteLine();
+        }
+
+        private static void PrintColored(string text, ConsoleColor color, (int startIndex, int endIndex) position)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (i == position.startIndex)
+                {
+                    Console.ForegroundColor = color;
+                }
+
+                if (i == position.endIndex)
+                {
+                    Console.ResetColor();
+                }
+
+                Console.Write(text[i]);
+            }
         }
     }
 }
