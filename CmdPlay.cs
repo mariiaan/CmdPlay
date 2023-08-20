@@ -12,9 +12,12 @@ using Task = System.Threading.Tasks.Task;
 namespace CmdPlay
 {
 
+
+
     class CmdPlay
     {
-        const string brightnessLevels0 = " .-+*wGHM#&%";
+
+        const string brightnessLevels0 = " .-+*wGHM#&%@";
         const string brightnessLevels1 = "          `.-':_,^=;><+!rc*/z?sLTv)J7(|F{C}fI31tlu[neoZ5Yxya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@██████████████";
 
         private static readonly object Lock = new object();
@@ -22,8 +25,7 @@ namespace CmdPlay
         static void Main(string[] args)
         {
 
-
-            string inputFilename;
+        string inputFilename;
 
             Console.WriteLine("Remember, Window size will affect the resolution of the video!!");
             Console.Write("Choose if you are using high or low resolution, 1. low(suggested)  2.high:");
@@ -149,6 +151,7 @@ namespace CmdPlay
             int frameIndex = 1;
             int percentage;
             int[,,] dIndex = new int[frameCount, targetFrameHeight, targetFrameWidth];
+
             Parallel.For(0, frameCount, a =>
             {
                 filename[a] = "tmp\\frames\\" + (a + 1).ToString() + ".bmp";
@@ -182,7 +185,7 @@ namespace CmdPlay
                                 {
                                     dIndex[a, y, x] = brightnessLevels.Length - 1;
                                 }
-                                frameBuilder[a].Replace('x', brightnessLevels[dIndex[a, y, x]], x + (y + 1) * W, 1);
+                                frameBuilder[a].Replace('x', brightnessLevels[dIndex[a, y, x]], x + y * (W + 1), 1);
                             });
                         });
                         width.Wait();
@@ -205,6 +208,7 @@ namespace CmdPlay
                     }
                 }
             });
+
 
             AudioFileReader reader = new AudioFileReader("tmp\\audio.wav");
             WaveOutEvent woe = new WaveOutEvent();
