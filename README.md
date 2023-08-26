@@ -1,5 +1,6 @@
 # CmdPlay
 Lets you play videos in command line using ASCII-Art.
+Note: This repo is outdated. Please check out the new repository for an improved version (https://github.com/mariiaan/cmdplay-pp)
 
 This program uses ffmpeg for video decoding and NAudio for audio playback.
 Thus it needs a reference to NAudio and a copy of ffmpeg.exe in the working directory.
